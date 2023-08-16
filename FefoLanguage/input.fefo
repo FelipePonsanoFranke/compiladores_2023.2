@@ -1,0 +1,24 @@
+programa
+
+booleano var1DD, var2.
+inteiro segundaVar.
+
+leia(var1DD).
+
+
+segundaVar := 4,1 - 1.
+var2 := var1DD.
+var2 := "abcd" == 1.
+
+
+se    ( segundaVar > 2)  entao{
+	leia(var1DD). 	
+} 
+senao { 
+	escreva("aaa"). 
+}
+
+
+decimal b.
+
+fimprog
