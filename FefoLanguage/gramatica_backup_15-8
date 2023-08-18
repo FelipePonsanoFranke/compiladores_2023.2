@@ -1,0 +1,163 @@
+grammar FefoLang;
+
+@header{
+	import java.util.ArrayList;
+	import fefolanguage.dataStructures.*;
+	import fefolanguage.exceptions.FefoExceptions;
+}
+
+@members{
+	private ArrayList<String> listaDeTokens = new ArrayList<String>();
+	private ArrayList<String> listaDeVariaveis = new ArrayList<String>();
+	
+	private int _tipo;
+	private String _varName;
+	private String _varValue;
+	private FefoSymbolTable _symbolTable = new FefoSymbolTable();
+	private FefoSymbol _symbol;
+	private int _tipoExprEsquerda;
+	private int _tipoExprDireita;
+	
+	private void inicializaID(){
+		_varName = ((TokenStream) _input).LT(-1).getText();
+		_varValue = null;
+		_symbol = new FefoSymbol(_varName, _tipo, _varValue);
+		if (!_symbolTable.exists(_varName)){
+			_symbolTable.add(_symbol);
+			listaDeVariaveis.add(_varName);
+		}
+		else{
+			throw new FefoExceptions("Variável " + _varName + " já inicializada anteriormente!");
+		}
+	}
+	
+	
+	private void utilizaID(){
+		_varName = ((TokenStream) _input).LT(-1).getText();
+		if(!_symbolTable.exists(_varName))
+			throw new FefoExceptions("Variável \"" + _varName + "\" nunca declarada.");	
+		else{
+			_symbolTable.get(_varName).setUsado(true);
+		}	
+	}
+	
+	private void finalizaPrograma(){
+		//vou passar por todas as variáveis declaradas para ver se elas são usadas.
+		for (int i = 0; i < listaDeVariaveis.size(); i++){
+			_symbol = _symbolTable.get(listaDeVariaveis.get(i));
+			//gero um aviso, mas não um erro de compilação
+			if(!_symbol.getUsado())
+				System.out.println("Aviso! Variável \"" + _symbol.getName() + "\" declarada, mas nunca usada");
+		}
+	}
+}
+
+prog 	: 'programa' bloco 'fimprog' {finalizaPrograma();}
+        ;
+         
+		
+bloco	: (cmd)+
+        ;
+
+cmd		: cmdDeclaracao | cmdLeitura | cmdEscrita | cmdCondicao | cmdAtribuicao
+        ; 
+
+cmdDeclaracao	: tipo ID {inicializaID();} ( VIR ID {inicializaID();} )* PF
+				;
+				
+tipo			: 'inteiro'{ _tipo = FefoVariable.INTEGER;} 
+				| 'decimal' {_tipo = FefoVariable.DOUBLE;}
+				| 'texto' {_tipo = FefoVariable.TEXT;}
+				| 'booleano' {_tipo = FefoVariable.BOOLEAN;}
+				;
+		   
+cmdLeitura		: 'leia' AP ID {utilizaID();} FP PF
+				;
+	
+cmdEscrita		: 'escreva' AP (TEXTO | ID {utilizaID();}) FP PF
+				;
+				
+
+		
+cmdCondicao		: 'se' AP expr opRel expr FP 'entao' ACH bloco FCH ('senao' ACH bloco FCH)?
+				;
+				
+cmdAtribuicao	:	ID { utilizaID();
+						_tipoExprEsquerda = _symbolTable.get(_varName).getType();
+						}
+					opAtr expr PF
+				;
+		
+opAtr			: ':='
+				;	
+		
+opRel			: '<' | '>' | '<=' | '>=' | '!=' | '=='
+				;
+				
+expr			: termo exprLinha*
+				;
+				
+exprLinha		: opExpr termo
+				;
+		 
+opExpr			: '+' | '-' 
+				;
+				
+termo			: fator termoLinha*
+				;
+				
+termoLinha		: opTermo fator
+				;
+				
+opTermo			: '*' | '/'
+				;
+
+
+fator			: DECIMAL | INTEIRO | BOOLEANO | TEXTO | ID {utilizaID();
+															System.out.println("id direita: " + _varName);
+															_tipoExprDireita = _symbolTable.get(_varName).getType();
+															if(_tipoExprEsquerda != _tipoExprDireita){
+																throw new FefoExceptions("Atribuição com tipos incompatíveis!");
+															}
+				} | AP expr FP
+				;
+				
+				
+ASPAS			: '"'
+				;
+				
+DECIMAL	 		: ('-')? [0-9]+ (PF [0-9]+)?
+		 		;
+		 		
+INTEIRO			: ('-')? [0-9]+
+				;
+	
+BOOLEANO		: 'true' | 'false'
+				;
+				
+TEXTO			: ASPAS ([a-z] | [A-Z] | [0-9])+ ASPAS
+				;
+				
+ID 				: [a-z] ([a-z] | [A-Z] | [0-9])*
+				;
+				
+VIR  			: ','
+     			;
+     
+ACH  			: '{'
+     			;
+     
+FCH  			: '}'
+     			;
+     			
+AP				: '('
+				;
+	
+FP				: ')'
+				;
+				
+PF				:'.'
+				;
+		 
+WS       		: (' ' | '\t' | '\n' | '\r') -> skip
+         		;		 		                     
