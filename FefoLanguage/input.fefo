@@ -1,0 +1,26 @@
+programa
+
+booleano var1DD, var2.
+inteiro segundaVar.
+
+leia(var1DD).
+escreva("gosta agora").
+
+segundaVar := 4 - 1.
+var2 := var1DD.
+var2 := "abcd" == "dcb".
+
+var1DD := 5 < 6.
+faca {
+	se    ( var2)  entao{
+		leia(var1DD). 	
+	} 
+	senao { 
+		escreva(" aaa "). 
+	}
+	var1DD := false.
+} enquanto (var1DD).
+
+decimal b.
+leia(b).
+fimprog
