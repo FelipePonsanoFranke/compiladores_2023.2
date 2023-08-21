@@ -1,0 +1,2 @@
+java -cp antlr-4.13.0-complete.jar org.antlr.v4.Tool FefoLang.g4 -package fefolanguage.parser -o src/fefolanguage/parser
+

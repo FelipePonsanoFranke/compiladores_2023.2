@@ -1,0 +1,32 @@
+programa
+
+booleano var1, var2.
+inteiro var3.
+
+leia(var3).
+var3 := 1 + 2 - 4 / 2 * 8 + 13.
+escreva("O valor de var3 é: ").
+escreva(var3).
+
+
+
+
+var2 := 3 > 1.
+
+var1 := var3 != 2.
+
+enquanto (var1){
+	se ( var2 )  entao{
+		escreva ("var2 era verdadeira, por isso eu apareci"). 	
+	} 
+	senao { 
+		escreva("Só apareci pois var2 era falsa"). 
+	}
+	var2 := "abcd" == "dcba".
+	var3 := var3 + 1.
+	var1 := var3 < 2.
+}
+
+decimal b.
+
+fimprog
